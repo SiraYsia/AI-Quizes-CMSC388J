@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from quiz_app.main import main
+from . import main
 
 @main.route('/')
 @main.route('/index')
