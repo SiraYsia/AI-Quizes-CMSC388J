@@ -3,6 +3,7 @@ from flask_login import login_user, current_user, logout_user, login_required
 from quiz_app import bcrypt, mongo
 from quiz_app.models import User
 from quiz_app.auth.forms import RegistrationForm, LoginForm
+from quiz_app.user.forms import ResetPasswordForm
 from . import auth
 from bson.objectid import ObjectId
 
@@ -46,6 +47,28 @@ def login():
             flash('Login unsuccessful. Please check email and password.', 'danger')
     
     return render_template('auth/login.html', title='Login', form=form)
+
+
+@auth.route('/reset-password', methods=['GET', 'POST'])
+@login_required
+def reset_password():
+    form = ResetPasswordForm()
+    
+    if form.validate_on_submit():
+        if bcrypt.check_password_hash(current_user.password, form.current_password.data):
+            hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+            
+            mongo.db.users.update_one(
+                {'_id': ObjectId(current_user.id)},
+                {'$set': {'password': hashed_password}}
+            )
+            
+            flash('Your password has been updated!', 'success')
+            return redirect(url_for('user.dashboard'))
+        else:
+            flash('Current password is incorrect.', 'danger')
+    
+    return render_template('user/reset_password.html', title='Reset Password', form=form)
 
 @auth.route('/logout')
 def logout():

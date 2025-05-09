@@ -1,8 +1,8 @@
+from flask import Blueprint, render_template, redirect, url_for, flash, request
 from flask_login import login_required, current_user
 from quiz_app import mongo, bcrypt
-from quiz_app.user.forms import UpdateProfileForm
+from quiz_app.user.forms import UpdateProfileForm, ResetPasswordForm
 from bson.objectid import ObjectId
-from flask import render_template, redirect, url_for, flash, request
 from . import user
 
 @user.route('/dashboard')
@@ -60,3 +60,27 @@ def profile():
         form.email.data = current_user.email
     
     return render_template('user/profile.html', title='Profile', form=form)
+
+
+@user.route('/reset-password', methods=['GET', 'POST'])
+@login_required
+def reset_password():
+    form = ResetPasswordForm()
+    
+    if form.validate_on_submit():
+        user_data = mongo.db.users.find_one({'_id': ObjectId(current_user.id)})
+        
+        if bcrypt.check_password_hash(user_data['password'], form.current_password.data):
+            hashed_password = bcrypt.generate_password_hash(form.new_password.data).decode('utf-8')
+            
+            mongo.db.users.update_one(
+                {'_id': ObjectId(current_user.id)},
+                {'$set': {'password': hashed_password}}
+            )
+            
+            flash('Your password has been updated!', 'success')
+            return redirect(url_for('user.dashboard'))
+        else:
+            flash('Current password is incorrect.', 'danger')
+    
+    return render_template('user/reset_password.html', title='Reset Password', form=form)

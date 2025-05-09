@@ -1,6 +1,6 @@
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
-from wtforms.validators import DataRequired, Email, ValidationError, Length
+from wtforms import StringField, PasswordField, SubmitField
+from wtforms.validators import DataRequired, Email, ValidationError, Length, EqualTo
 from flask_login import current_user
 from quiz_app import mongo
 
@@ -20,3 +20,9 @@ class UpdateProfileForm(FlaskForm):
             user = mongo.db.users.find_one({'email': email.data})
             if user:
                 raise ValidationError('Email is already registered.')
+
+class ResetPasswordForm(FlaskForm):
+    current_password = PasswordField('Current Password', validators=[DataRequired()])
+    new_password = PasswordField('New Password', validators=[DataRequired()])
+    confirm_password = PasswordField('Confirm New Password', validators=[DataRequired(), EqualTo('new_password')])
+    submit = SubmitField('Update Password')
