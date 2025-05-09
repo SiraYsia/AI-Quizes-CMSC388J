@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Quiz History</h1>
+    
+    {% if attempts %}
+        <div class="row">
+            <div class="col-md-10 offset-md-1">
+                <div class="card">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="card-title mb-0">Your Previous Attempts</h3>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-striped mb-0">
+                                <thead>
+                                    <tr>
+                                        <th>Topic</th>
+                                        <th>Difficulty</th>
+                                        <th>Score</th>
+                                        <th>Date</th>
+                                        <th>Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    {% for attempt in attempts %}
+                                    <tr>
+                                        <td>
+                                            <div class="accordion" id="topicAccordion{{ loop.index }}">
+                                                <div class="accordion-item border-0">
+                                                    <h2 class="accordion-header" id="topicHeading{{ loop.index }}">
+                                                        <button class="accordion-button collapsed p-0 bg-transparent" type="button" 
+                                                                data-bs-toggle="collapse" 
+                                                                data-bs-target="#topicCollapse{{ loop.index }}" 
+                                                                aria-expanded="false" 
+                                                                aria-controls="topicCollapse{{ loop.index }}">
+                                                            {{ attempt.topic[:30] }}{% if attempt.topic|length > 30 %}...{% endif %}
+                                                        </button>
+                                                    </h2>
+                                                    <div id="topicCollapse{{ loop.index }}" 
+                                                         class="accordion-collapse collapse" 
+                                                         aria-labelledby="topicHeading{{ loop.index }}" 
+                                                         data-bs-parent="#topicAccordion{{ loop.index }}">
+                                                        <div class="accordion-body p-0 pt-2">
+                                                            {{ attempt.topic|nl2br }}
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge {% if attempt.difficulty == 'hard' %}bg-danger{% elif attempt.difficulty == 'medium' %}bg-warning{% else %}bg-success{% endif %}">
+                                                {{ attempt.difficulty|capitalize }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <div class="progress flex-grow-1" style="height: 10px;">
+                                                    <div class="progress-bar {% if attempt.percentage >= 80 %}bg-success{% elif attempt.percentage >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                                        role="progressbar" style="width: {{ attempt.percentage }}%;" 
+                                                        aria-valuenow="{{ attempt.percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                                    </div>
+                                                </div>
+                                                <span class="ms-2">{{ attempt.score }}/{{ attempt.total_questions }} ({{ attempt.percentage|round|int }}%)</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ attempt.completed_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                                        <td>
+                                            <a href="{{ url_for('quiz.results', attempt_id=attempt._id) }}" class="btn btn-sm btn-primary">View</a>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ url_for('quiz.create') }}" class="btn btn-primary">Create New Quiz</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="alert alert-info">
+            <h4 class="alert-heading">No quiz history yet!</h4>
+            <p>You haven't taken any quizzes yet. Start by creating your first quiz.</p>
+            <hr>
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <a href="{{ url_for('quiz.create') }}" class="btn btn-primary">Create Your First Quiz</a>
+            </div>
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

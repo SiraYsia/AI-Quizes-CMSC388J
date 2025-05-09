@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Quiz Results</h1>
+    
+    <div class="card mb-4">
+        <div class="card-header bg-primary text-white">
+            <h3 class="card-title mb-0">Quiz Topic</h3>
+        </div>
+        <div class="card-body">
+            <div class="accordion" id="topicAccordion">
+                <div class="accordion-item">
+                    <h2 class="accordion-header" id="topicHeading">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" 
+                                data-bs-target="#topicCollapse" aria-expanded="false" aria-controls="topicCollapse">
+                            View Quiz Topic
+                        </button>
+                    </h2>
+                    <div id="topicCollapse" class="accordion-collapse collapse" aria-labelledby="topicHeading" 
+                         data-bs-parent="#topicAccordion">
+                        <div class="accordion-body">
+                            <p>{{ quiz.topic|nl2br }}</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row mb-4">
+        <div class="col-md-8 offset-md-2">
+            {% set score_class = 'high-score' if attempt.percentage >= 80 else ('medium-score' if attempt.percentage >= 50 else 'low-score') %}
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Score Summary</h3>
+                </div>
+                <div class="card-body results-summary {{ score_class }}">
+                    <div class="text-center">
+                        <h3>Your Score: {{ attempt.score }} / {{ attempt.total_questions }}</h3>
+                        <h4>{{ attempt.percentage|round|int }}%</h4>
+                        <div class="progress" style="height: 30px;">
+                            <div class="progress-bar {% if attempt.percentage >= 80 %}bg-success{% elif attempt.percentage >= 50 %}bg-warning{% else %}bg-danger{% endif %}" 
+                                role="progressbar" style="width: {{ attempt.percentage }}%;" 
+                                aria-valuenow="{{ attempt.percentage }}" aria-valuemin="0" aria-valuemax="100">
+                                {{ attempt.percentage|round|int }}%
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title mb-0">Question Review</h3>
+                </div>
+                <div class="card-body">
+                    {% for question_index in range(quiz.questions|length) %}
+                        {% set question = quiz.questions[question_index] %}
+                        {% set selected_option = user_answers_dict[question_index] if question_index in user_answers_dict else -1 %}
+                        
+                        <div class="question-container mb-4">
+                            <h4>Question {{ question_index + 1 }}: {{ question.question }}</h4>
+                            
+                            {% for option_index in range(question.options|length) %}
+                                {% set option = question.options[option_index] %}
+                                {% set is_selected = selected_option == option_index %}
+                                {% set is_correct = option_index == question.correct_answer %}
+                                
+                                <div class="form-check answer-option 
+                                    {% if is_selected and is_correct %}correct-answer
+                                    {% elif is_selected and not is_correct %}incorrect-answer
+                                    {% elif is_correct %}correct-answer{% endif %}">
+                                    
+                                    <input class="form-check-input" type="radio" disabled 
+                                           {% if is_selected %}checked{% endif %}>
+                                    <label class="form-check-label">
+                                        {{ option }}
+                                        {% if is_correct %}
+                                            <span class="badge bg-success">Correct Answer</span>
+                                        {% endif %}
+                                        {% if is_selected and not is_correct %}
+                                            <span class="badge bg-danger">Your Answer</span>
+                                        {% endif %}
+                                    </label>
+                                </div>
+                            {% endfor %}
+                            
+                            <div class="mt-2">
+                                <p><strong>Explanation:</strong> {{ question.explanation }}</p>
+                            </div>
+                        </div>
+                        
+                        {% if not loop.last %}<hr>{% endif %}
+                    {% endfor %}
+                </div>
+                <div class="card-footer">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ url_for('quiz.history') }}" class="btn btn-secondary">View History</a>
+                        <a href="{{ url_for('quiz.create') }}" class="btn btn-primary">Create Another Quiz</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

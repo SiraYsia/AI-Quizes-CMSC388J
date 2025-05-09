@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="container">
+    <h1 class="mb-4">Create a Quiz</h1>
+    <div class="row">
+        <div class="col-md-8 offset-md-2">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="card-title">Quiz Inputs</h3>
+                </div>
+                <div class="card-body">
+                    <form method="POST">
+                        {{ form.hidden_tag() }}
+                        <div class="mb-3">
+                            {{ form.topic.label(class="form-label") }}
+                            {% if form.topic.errors %}
+                                {{ form.topic(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.topic.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.topic(class="form-control") }}
+                            {% endif %}
+                            <small class="form-text text-muted">Enter a topic or paste your notes to generate questions from. The more specific your text, the better the quiz will be.</small>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.num_questions.label(class="form-label") }}
+                            {% if form.num_questions.errors %}
+                                {{ form.num_questions(class="form-control is-invalid") }}
+                                <div class="invalid-feedback">
+                                    {% for error in form.num_questions.errors %}
+                                        <span>{{ error }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% else %}
+                                {{ form.num_questions(class="form-control") }}
+                            {% endif %}
+                            <small class="form-text text-muted">Choose between 1 and 10 questions.</small>
+                        </div>
+                        <div class="mb-3">
+                            {{ form.difficulty.label(class="form-label") }}
+                            <div class="btn-group w-100" role="group">
+                                {% for subfield in form.difficulty %}
+                                    <div class="form-check form-check-inline">
+                                        {{ subfield(class="btn-check") }}
+                                        {{ subfield.label(class="btn btn-outline-primary") }}
+                                    </div>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="d-grid gap-2">
+                            {{ form.submit(class="btn btn-primary") }}
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

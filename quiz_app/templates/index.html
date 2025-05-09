@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% block content %}
+<div class="jumbotron text-center bg-light p-5 rounded">
+    <h1 class="display-4">Welcome to AI QUIZES</h1>
+    <p class="lead">Create custom quizzes on any topic using artificial intelligence</p>
+    <hr class="my-4">
+    <p>Generate multiple-choice quizzes, test your knowledge, and track your progress.</p>
+    {% if current_user.is_authenticated %}
+    <a class="btn btn-primary btn-lg" href="{{ url_for('quiz.create') }}">Create a Quiz</a>
+    {% else %}
+    <a class="btn btn-primary btn-lg" href="{{ url_for('auth.register') }}">Get Started</a>
+    <a class="btn btn-outline-secondary btn-lg" href="{{ url_for('auth.login') }}">Login</a>
+    {% endif %}
+</div>
+
+<div class="row mt-5">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h3 class="card-title">AI-Generated Questions</h3>
+                <p class="card-text">Our system uses advanced AI to create high-quality questions on any topic.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h3 class="card-title">Instant Feedback</h3>
+                <p class="card-text">Get immediate results and explanations after completing a quiz.</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-body text-center">
+                <h3 class="card-title">Track Progress</h3>
+                <p class="card-text">Review your quiz history and see how your knowledge improves over time.</p>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
