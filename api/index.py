@@ -1,11 +1,19 @@
-from flask import Flask
+import sys
+import os
 
-app = Flask(__name__)
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-@app.route('/')
-def home():
-    return "Hello World from AI Quiz Generator! Basic app is working."
-
-@app.route('/api/health')
-def health():
-    return {"status": "ok"}
+try:
+    from quiz_app import create_app
+    app = create_app()
+except Exception as e:
+    from flask import Flask
+    app = Flask(__name__)
+    
+    @app.route('/')
+    def home():
+        return f"Error loading full app"
+    
+    @app.route('/api/health')
+    def health():
+        return {"status": "ok", "full_app": False}
