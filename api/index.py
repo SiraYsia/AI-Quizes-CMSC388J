@@ -1,10 +1,11 @@
-from flask import Flask, request
-import sys
-import os
+from flask import Flask
 
-sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+app = Flask(__name__)
 
-from run import app
+@app.route('/')
+def home():
+    return "Hello World from AI Quiz Generator! Basic app is working."
 
-def handler(request):
-    return app(request)
+@app.route('/api/health')
+def health():
+    return {"status": "ok"}

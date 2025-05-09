@@ -3,9 +3,9 @@ from flask import Flask
 app = Flask(__name__)
 
 @app.route('/')
-def home():
-    return "API is working!"
+def test_home():
+    return "Test route is working!"
 
-@app.route('/api/health')
-def health():
-    return {"status": "ok"}
+@app.route('/test')
+def test():
+    return {"message": "Test API endpoint is working"}
